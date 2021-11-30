@@ -92,6 +92,34 @@
                      // määra HTML-is elemendile id-ga "parasjagu_aasta" sama väärtus, mille kasutaja liuguril valib
                     document.getElementById('parasjagu_aasta').innerText = kasutaja_aasta;
                 });
+				
+				// lisa popup, kui kasutaja mõnel kaardil klikib
+				map.on('click', (event) => {
+					
+					// kui klikitakse, siis võta kihilt "eesti_filmid"
+					// punktid, mis klikkimise piirkonda jäävad
+					const features = map.queryRenderedFeatures(event.point, {
+						layers: ['eesti_filmid']
+					});
+					
+					// kui ei jää ühtegi punkti
+					if (!features.length){
+						return; // ära näita midagi
+					}
+					
+					// kui jääb mõni punkt
+					const feature = features[0]; // siis võta neist kõige esimene
+					
+					// tee popup, mis paikneks punktist kaardil natuke ülevalpool
+					const popup = new mapboxgl.Popup({offset: [0, -15]});
+					
+					// sea popupi koordinaatideks punkti koordinaadid andmestikus
+					popup.setLngLat(feature.geometry.coordinates);
+					// määra popupi sisu (koht + esinemiskordade arv)
+					popup.setHTML('<h3>' + feature.properties.koht + '</h3><p>Esinemiskordi: ' + feature.properties.n + '</p>')
+					// lisa popup kaardile
+					popup.addTo(map);
+				});
             });
         </script>
     </body>
